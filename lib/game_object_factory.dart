@@ -1,6 +1,7 @@
 part of game;
 
-const int _maxLevel = 9;
+
+const int _maxLevel = 3;
 
 class GameObjectFactory {
   GameObjectFactory(this.sheet, this.sounds, this.level, this.playerState);
@@ -17,14 +18,14 @@ class GameObjectFactory {
     for (int i = 0; i < numAsteroids; i++) {
       GameObject obj;
       if (i == 0)
-        obj = new AsteroidPowerUp(this);
+      obj = new AsteroidPowerUp(this);
       else if (randomDouble() < distribution)
-        obj = new AsteroidBig(this);
+      obj = new AsteroidBig(this);
       else
-        obj = new AsteroidSmall(this);
+      obj = new AsteroidSmall(this);
 
       Offset pos = new Offset(randomSignedDouble() * 160.0,
-                            yPos + _chunkSpacing * randomDouble());
+      yPos + _chunkSpacing * randomDouble());
       addGameObject(obj, pos);
     }
   }
@@ -83,30 +84,65 @@ class GameObjectFactory {
   void addBossFight(int level, double yPos) {
     // Add boss
     EnemyBoss boss = new EnemyBoss(this, level);
-    Offset pos = new Offset(0.0, yPos + _chunkSpacing / 2.0);
+    Offset pos = new Offset(0.0, yPos + _chunkSpacing/2.0 + 25.0);
+
+    //print('level: ${level}');
+
+    List types = [];
+    if(level == 0) {types = ['surprised', 'disgusted', 'happy', 'done'];}
+    if(level == 1) {types = ['angry', 'afraid', 'sad', 'done'];}
 
     addGameObject(boss, pos);
 
     playerState.boss = boss;
 
-    int destroyerLevel = (level - 1 ~/ 3).clamp(0, 2);
+    // int destroyerLevel = (level - 1 ~/ 3).clamp(0, 2);
 
-    // Add boss's helpers
-    if (level >= 1) {
-      EnemyDestroyer destroyer0 = new EnemyDestroyer(this, destroyerLevel);
-      addGameObject(destroyer0, new Offset(-80.0, yPos + _chunkSpacing / 2.0 + 70.0));
+    BossText0 txt0 = new BossText0(this);
+    Offset txt0pos = new Offset(0.0, yPos + _chunkSpacing / 0.75 - 150.0);
 
-      EnemyDestroyer destroyer1 = new EnemyDestroyer(this, destroyerLevel);
-      addGameObject(destroyer1, new Offset(80.0, yPos + _chunkSpacing / 2.0 + 70.0));
+    addGameObject(txt0, txt0pos);
 
-      if (level >= 2) {
-        EnemyDestroyer destroyer0 = new EnemyDestroyer(this, destroyerLevel);
-        addGameObject(destroyer0, new Offset(-80.0, yPos + _chunkSpacing / 2.0 - 70.0));
+    Emoti emo0 = new Emoti(this, types[0]);
+    Offset emo0pos = new Offset(-35.0, yPos + _chunkSpacing / 1.1 - 150.0);
 
-        EnemyDestroyer destroyer1 = new EnemyDestroyer(this, destroyerLevel);
-        addGameObject(destroyer1, new Offset(80.0, yPos + _chunkSpacing / 2.0 - 70.0));
-      }
-    }
+    addGameObject(emo0, emo0pos);
+
+    Emoti emo1 = new Emoti(this, types[1]);
+    Offset emo1pos = new Offset(-105.0, yPos + _chunkSpacing / 1.1 - 150.0);
+
+    addGameObject(emo1, emo1pos);
+
+    Emoti emo2 = new Emoti(this, types[2]);
+    Offset emo2pos = new Offset(35.0, yPos + _chunkSpacing / 1.1 - 150.0);
+
+    addGameObject(emo2, emo2pos);
+
+    Emoti emo3 = new Emoti(this, types[3]);
+    Offset emo3pos = new Offset(105.0, yPos + _chunkSpacing / 1.1 - 150.0);
+
+    addGameObject(emo3, emo3pos);
+
+
+    // Add boss's helpers3
+    // if (level >= 1) {
+    //   EnemyDestroyer destroyer0 = new EnemyDestroyer(this, destroyerLevel);
+    //   addGameObject(destroyer0, new Offset(-80.0, yPos + _chunkSpacing / 2.0 + 70.0));
+    //
+    //   EnemyDestroyer destroyer1 = new EnemyDestroyer(this, destroyerLevel);
+    //   addGameObject(destroyer1, new Offset(80.0, yPos + _chunkSpacing / 2.0 + 70.0));
+    //
+    //   if (level >= 2) {
+    //     EnemyDestroyer destroyer0 = new EnemyDestroyer(this, destroyerLevel);
+    //     addGameObject(destroyer0, new Offset(-80.0, yPos + _chunkSpacing / 2.0 - 70.0));
+    //
+    //     EnemyDestroyer destroyer1 = new EnemyDestroyer(this, destroyerLevel);
+    //     addGameObject(destroyer1, new Offset(80.0, yPos + _chunkSpacing / 2.0 - 70.0));
+    //   }
+    // }
+
+
+
   }
 }
 

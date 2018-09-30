@@ -26,6 +26,10 @@ class PlayerState extends Node {
     _coinDisplay.position = new Offset(252.0, 49.0);
     _spriteBackgroundCoins.addChild(_coinDisplay);
 
+
+    // TODO Dalia: Emoti Display, for all 6 emotions
+
+
     laserLevel = _gameState.laserLevel;
   }
 
@@ -55,14 +59,17 @@ class PlayerState extends Node {
     flashBackgroundSprite(_spriteBackgroundScore);
   }
 
+  //TODO Dalia:
+  // int get emotis => _emotiDisplay.score;
   int get coins => _coinDisplay.score;
+
 
   void addCoin(Coin c) {
     // Animate coin to the top of the screen
     Offset startPos = convertPointFromNode(Offset.zero, c);
     Offset finalPos = new Offset(30.0, 30.0);
     Offset middlePos = new Offset((startPos.dx + finalPos.dx) / 2.0 + 50.0,
-      (startPos.dy + finalPos.dy) / 2.0);
+    (startPos.dy + finalPos.dy) / 2.0);
 
     List<Offset> path = <Offset>[startPos, middlePos, finalPos];
 
@@ -86,6 +93,41 @@ class PlayerState extends Node {
     addChild(sprite);
   }
 
+  void addEmoti(Emoti c) {
+    // Animate coin to the top of the screen
+    Offset startPos = convertPointFromNode(Offset.zero, c);
+    Offset finalPos = new Offset(30.0, 30.0);
+    Offset middlePos = new Offset((startPos.dx + finalPos.dx) / 2.0 + 50.0,
+    (startPos.dy + finalPos.dy) / 2.0);
+
+    List<Offset> path = <Offset>[startPos, middlePos, finalPos];
+
+    Sprite sprite = new Sprite(_sheetGame[c.filename]);
+    sprite.scale = 0.7;
+
+    ActionSpline spline = new ActionSpline((Offset a) { sprite.position = a; }, path, 0.5);
+    spline.tension = 0.25;
+    ActionTween rotate = new ActionTween<double>((a) { sprite.rotation = a; }, 0.0, 360.0, 0.5);
+    ActionTween scale = new ActionTween<double>((a) { sprite.scale = a; }, 0.7, 1.2, 0.5);
+    ActionGroup group = new ActionGroup(<Action>[spline, rotate, scale]);
+    sprite.actions.run(new ActionSequence(<Action>[
+      group,
+      new ActionRemoveNode(sprite),
+      new ActionCallFunction(() {
+        ////_coinDisplay.score += 1;
+        /// TODO dalia: I need emotiDisplay.score by types
+        //_emotiDisplay.score += 1;
+        ////flashBackgroundSprite(_spriteBackgroundCoins);
+        /// TODO dalia: I need _spriteBackgroundEmotis by types
+        //flashBackgroundSprite(_spriteBackgroundEmotis);
+      })
+    ]));
+
+    addChild(sprite);
+    if (boss != null && c.filename == "star_2.png") { boss.destroy(); }
+  }
+
+
   void activatePowerUp(PowerUpType type) {
     if (type == PowerUpType.shield) {
       _shieldFrames += _gameState.powerUpFrames(type);
@@ -102,7 +144,7 @@ class PlayerState extends Node {
   int _shieldFrames = 0;
   bool get shieldActive => _shieldFrames > 0 || _speedBoostFrames > 0;
   bool get shieldDeactivating =>
-    math.max(_shieldFrames, _speedBoostFrames) > 0 && math.max(_shieldFrames, _speedBoostFrames) < 60;
+  math.max(_shieldFrames, _speedBoostFrames) > 0 && math.max(_shieldFrames, _speedBoostFrames) < 60;
 
   int _sideLaserFrames = 0;
   bool get sideLaserActive => _sideLaserFrames > 0;
@@ -120,67 +162,67 @@ class PlayerState extends Node {
       new Color(0x66ccfff0),
       new Color(0x00ccfff0),
       0.3);
-    sprite.actions.run(flash);
-  }
+      sprite.actions.run(flash);
+    }
 
-  void update(double dt) {
-    if (_shieldFrames > 0)
+    void update(double dt) {
+      if (_shieldFrames > 0)
       _shieldFrames--;
-    if (_sideLaserFrames > 0)
+      if (_sideLaserFrames > 0)
       _sideLaserFrames--;
-    if (_speedLaserFrames > 0)
+      if (_speedLaserFrames > 0)
       _speedLaserFrames--;
-    if (_speedBoostFrames > 0)
+      if (_speedBoostFrames > 0)
       _speedBoostFrames--;
 
-    // Update speed
-    if (boss != null) {
-      Offset globalBossPos = boss.convertPointToBoxSpace(Offset.zero);
-      if (globalBossPos.dy > (_gameSizeHeight - 400.0))
+      // Update speed
+      if (boss != null) {
+        Offset globalBossPos = boss.convertPointToBoxSpace(Offset.zero);
+        if (globalBossPos.dy > (_gameSizeHeight - 400.0))
         _scrollSpeedTarget = 0.0;
-      else
+        else
         _scrollSpeedTarget = normalScrollSpeed;
-    } else {
-      if (speedBoostActive)
+      } else {
+        if (speedBoostActive)
         _scrollSpeedTarget = normalScrollSpeed * 6.0;
-      else
+        else
         _scrollSpeedTarget = normalScrollSpeed;
-    }
-
-    scrollSpeed = GameMath.filter(scrollSpeed, _scrollSpeedTarget, 0.1);
-  }
-}
-
-class ScoreDisplay extends Node {
-  ScoreDisplay(this._sheetUI);
-
-  int _score = 0;
-
-  int get score => _score;
-
-  set score(int score) {
-    _score = score;
-    _dirtyScore = true;
-  }
-
-  SpriteSheet _sheetUI;
-
-  bool _dirtyScore = true;
-
-  void update(double dt) {
-    if (_dirtyScore) {
-      removeAllChildren();
-
-      String scoreStr = _score.toString();
-      double xPos = -37.0;
-      for (int i = scoreStr.length - 1; i >= 0; i--) {
-        String numStr = scoreStr.substring(i, i + 1);
-        Sprite numSprite = new Sprite(_sheetUI["number_$numStr.png"]);
-        numSprite.position = new Offset(xPos, 0.0);
-        addChild(numSprite);
-        xPos -= 37.0;
       }
-      _dirtyScore = false;
+
+      scrollSpeed = GameMath.filter(scrollSpeed, _scrollSpeedTarget, 0.1);
     }
   }
-}
+
+  class ScoreDisplay extends Node {
+    ScoreDisplay(this._sheetUI);
+
+    int _score = 0;
+
+    int get score => _score;
+
+    set score(int score) {
+      _score = score;
+      _dirtyScore = true;
+    }
+
+    SpriteSheet _sheetUI;
+
+    bool _dirtyScore = true;
+
+    void update(double dt) {
+      if (_dirtyScore) {
+        removeAllChildren();
+
+        String scoreStr = _score.toString();
+        double xPos = -37.0;
+        for (int i = scoreStr.length - 1; i >= 0; i--) {
+          String numStr = scoreStr.substring(i, i + 1);
+          Sprite numSprite = new Sprite(_sheetUI["number_$numStr.png"]);
+          numSprite.position = new Offset(xPos, 0.0);
+          addChild(numSprite);
+          xPos -= 37.0;
+        }
+        _dirtyScore = false;
+      }
+    }
+  }

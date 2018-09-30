@@ -91,18 +91,39 @@ class LevelLabel extends GameObject {
     canBeDamaged = false;
 
     Label lbl = new Label(
-      "LEVEL $level",
+      "FACE THESE FEELINGS",
       textAlign: TextAlign.center,
       textStyle: new TextStyle(
         fontFamily: "Orbitron",
-        letterSpacing: 10.0,
+        letterSpacing: 3.0,
         color:new Color(0xffffffff),
-        fontSize: 24.0,
-        fontWeight: FontWeight.w600
+        fontSize: 18.0,
+        fontWeight: FontWeight.w700
       ));
     addChild(lbl);
   }
 }
+
+class BossText0 extends GameObject {
+  BossText0(GameObjectFactory f) : super(f) {
+    canDamageShip = false;
+    canBeDamaged = false;
+
+    Label lbl = new Label(
+      "How do YOU feel?",
+      textAlign: TextAlign.center,
+      textStyle: new TextStyle(
+        fontFamily: "Orbitron",
+        letterSpacing: 3.0,
+        color:new Color(0xffffffff),
+        fontSize: 20.0,
+        fontWeight: FontWeight.w900
+      ));
+    addChild(lbl);
+  }
+}
+
+
 
 class Ship extends GameObject {
   Ship(GameObjectFactory f) : super(f) {
@@ -122,7 +143,7 @@ class Ship extends GameObject {
     canDamageShip = false;
 
     // Set start position
-    position = new Offset(0.0, 50.0);
+    position = new Offset(0.0, 100.0);
   }
 
   Sprite _sprite;
@@ -474,11 +495,11 @@ class EnemyBoss extends Obstacle {
     _countDown -= 1;
     if (_countDown <= 0) {
       // Shoot at player
-      f.sounds.play("laser");
+      // f.sounds.play("laser");
 
-      fire(10.0);
-      fire(0.0);
-      fire(-10.0);
+      // fire(10.0);
+      // fire(0.0);
+      // fire(-10.0);
 
       _countDown = 60 + randomInt(120);
     }
@@ -574,6 +595,67 @@ class Coin extends Collectable {
   void collect() {
     f.sounds.play("pickup_0");
     f.playerState.addCoin(this);
+    super.collect();
+  }
+}
+
+// TODO Dalia: make a Emotis Collectable Class, to be used in boss battles
+class Emoti extends Collectable {
+  String _filename;
+
+  Emoti(GameObjectFactory f, String type) : super(f) {
+    if(type == 'surprised') {
+      _filename = "asteroid_small_0.png";
+      _sprite = new Sprite(f.sheet["asteroid_small_0.png"]);
+    }
+    if(type == 'disgusted') {
+      _filename = "asteroid_small_1.png";
+      _sprite = new Sprite(f.sheet["asteroid_small_1.png"]);
+    }
+    if(type == 'happy') {
+      _filename = "asteroid_small_2.png";
+      _sprite = new Sprite(f.sheet["asteroid_small_2.png"]);
+    }
+    if(type == 'angry') {
+      _filename = "asteroid_big_0.png";
+      _sprite = new Sprite(f.sheet["asteroid_big_0.png"]);
+    }
+    if(type == 'afraid') {
+      _filename = "asteroid_big_1.png";
+      _sprite = new Sprite(f.sheet["asteroid_big_1.png"]);
+    }
+    if(type == 'sad') {
+      _filename = "asteroid_big_2.png";
+      _sprite = new Sprite(f.sheet["asteroid_big_2.png"]);
+    }
+    if(type == 'done') {
+      _filename = "star_2.png";
+      _sprite = new Sprite(f.sheet["star_2.png"]);
+    }
+
+    _sprite.scale = 0.7;
+    addChild(_sprite);
+
+    radius = 7.5;
+  }
+
+  String get filename => _filename;
+
+  void setupActions() {
+    // Rotate
+    ActionTween rotate = new ActionTween<double>((a) { _sprite.rotation = a; }, 0.0, 360.0, 6.5);
+    actions.run(new ActionRepeatForever(rotate));
+
+    // Fade in
+    ActionTween fadeIn = new ActionTween<double>((a) { _sprite.opacity = a; }, 0.0, 1.0, 0.6);
+    actions.run(fadeIn);
+  }
+
+  Sprite _sprite;
+
+  void collect() {
+    f.sounds.play("pickup_0");
+    f.playerState.addEmoti(this);
     super.collect();
   }
 }

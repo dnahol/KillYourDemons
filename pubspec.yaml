@@ -1,7 +1,9 @@
-name: spaceblast
+name: killyourdemons
 description: A new Flutter project.
 
 dependencies:
+  flutter_cache_manager:
+    git: https://github.com/Cretezy/flutter_cache_manager.git
   flutter:
     sdk: flutter
   spritewidget:
@@ -32,7 +34,8 @@ flutter:
     - assets/nebula.png
     - assets/sprites.json
     - assets/sprites.png
-    - assets/starfield.png
+    - assets/ocean.png
+    - assets/done.png
     - assets/game_ui.png
     - assets/game_ui.json
     - assets/ui_bg_top.png
@@ -89,5 +92,5 @@ flutter:
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #
-  # For details regarding fonts from package dependencies, 
+  # For details regarding fonts from package dependencies,
   # see https://flutter.io/custom-fonts/#from-packages

@@ -21,11 +21,11 @@ class GameDemoNode extends NodeWithSize {
     this._gameOverCallback
   ): super(new Size(320.0, 320.0)) {
     // Add background
-    _background = new RepeatedImage(_images["assets/starfield.png"]);
+    _background = new RepeatedImage(_images["assets/ocean.png"]);
     addChild(_background);
 
     // Create starfield
-    _starField = new StarField(_spritesGame, 200);
+    _starField = new StarField(_spritesGame, 50);
     addChild(_starField);
 
     // Add nebula
@@ -150,7 +150,8 @@ class GameDemoNode extends NodeWithSize {
       for (GameObject damageable in damageables) {
         if (laser.collidingWith(damageable)) {
           // Hit something that can take damage
-          damageable.addDamage(laser.impact);
+
+          if(!(damageable is EnemyBoss)) { damageable.addDamage(laser.impact); }
           laser.destroy();
         }
       }
@@ -163,9 +164,8 @@ class GameDemoNode extends NodeWithSize {
         if (node.collidingWith(_level.ship)) {
           if (_playerState.shieldActive) {
             // Hit, but saved by the shield!
-            if (!(node is EnemyBoss))
-              node.destroy();
-          } else {
+            if (!(node is EnemyBoss)) { node.destroy(); }
+          } else if(!(node is EnemyBoss)) {
             // The ship was hit :(
             killShip();
           }
@@ -188,94 +188,102 @@ class GameDemoNode extends NodeWithSize {
         _chunk,
         -_chunk * _chunkSpacing - _chunkSpacing);
 
-      _chunk += 1;
+        _chunk += 1;
+      }
+    }
+
+    void addLevelChunk(int chunk, double yPos) {
+      int level = chunk ~/ _chunksPerLevel + _gameState.currentStartingLevel;
+      int part = chunk % _chunksPerLevel;
+
+      if (part == 0) {
+        LevelLabel lbl = new LevelLabel(_objectFactory, level + 1);
+        lbl.position = new Offset(0.0, yPos + _chunkSpacing / 2.0 - 150.0);
+
+        _topLevelReached = level;
+        _level.addChild(lbl);
+      }
+      // TODO Dalia: done: add this back in
+
+      else if (part == 1) {
+        _objectFactory.addAsteroids(level, yPos);
+      } else if (part == 2) {
+        _objectFactory.addEnemyScoutSwarm(level, yPos);
+      } else if (part == 3) {
+        _objectFactory.addAsteroids(level, yPos);
+      } else if (part == 4) {
+        _objectFactory.addEnemyDestroyerSwarm(level, yPos);
+      } else if (part == 5) {
+        _objectFactory.addAsteroids(level, yPos);
+      } else if (part == 6) {
+        _objectFactory.addEnemyScoutSwarm(level, yPos);
+      } else if (part == 7) {
+        _objectFactory.addAsteroids(level, yPos);
+      }
+
+      // TODO Dalia: done: change this back to part == 8
+      else if (part == 8) {
+        _objectFactory.addBossFight(level, yPos);
+
+      }
+    }
+
+    void fire() {
+
+      int laserLevel = _objectFactory.playerState.laserLevel;
+
+      Laser shot0 = new Laser(_objectFactory, laserLevel, -90.0);
+      shot0.position = _level.ship.position + new Offset(17.0, -10.0);
+      _level.addChild(shot0);
+
+      Laser shot1 = new Laser(_objectFactory, laserLevel, -90.0);
+      shot1.position = _level.ship.position + new Offset(-17.0, -10.0);
+      _level.addChild(shot1);
+
+      if (_playerState.sideLaserActive) {
+        Laser shot2 = new Laser(_objectFactory, laserLevel, -45.0);
+        shot2.position = _level.ship.position + new Offset(17.0, -10.0);
+        _level.addChild(shot2);
+
+        Laser shot3 = new Laser(_objectFactory, laserLevel, -135.0);
+        shot3.position = _level.ship.position + new Offset(-17.0, -10.0);
+        _level.addChild(shot3);
+      }
+    }
+
+    void killShip() {
+      // Hide ship
+      _level.ship.visible = false;
+
+      _sounds.play("explosion_player");
+
+      // Add explosion
+      ExplosionBig explo = new ExplosionBig(_spritesGame);
+      explo.scale = 1.5;
+      explo.position = _level.ship.position;
+      _level.addChild(explo);
+
+      // Add flash
+      Flash flash = new Flash(size, 1.0);
+      addChild(flash);
+
+      // Set the state to game over
+      _gameOver = true;
+
+      // Return to main scene and report the score back in 2 seconds
+      new Timer(new Duration(seconds: 2), () { _gameOverCallback(_playerState.score, _playerState.coins, _topLevelReached); });
     }
   }
 
-  void addLevelChunk(int chunk, double yPos) {
-    int level = chunk ~/ _chunksPerLevel + _gameState.currentStartingLevel;
-    int part = chunk % _chunksPerLevel;
+  class Level extends Node {
+    Level() {
+      position = new Offset(160.0, 0.0);
+    }
 
-    if (part == 0) {
-      LevelLabel lbl = new LevelLabel(_objectFactory, level + 1);
-      lbl.position = new Offset(0.0, yPos + _chunkSpacing / 2.0 - 150.0);
+    Ship ship;
 
-      _topLevelReached = level;
-      _level.addChild(lbl);
-    } else if (part == 1) {
-      _objectFactory.addAsteroids(level, yPos);
-    } else if (part == 2) {
-      _objectFactory.addEnemyScoutSwarm(level, yPos);
-    } else if (part == 3) {
-      _objectFactory.addAsteroids(level, yPos);
-    } else if (part == 4) {
-      _objectFactory.addEnemyDestroyerSwarm(level, yPos);
-    } else if (part == 5) {
-      _objectFactory.addAsteroids(level, yPos);
-    } else if (part == 6) {
-      _objectFactory.addEnemyScoutSwarm(level, yPos);
-    } else if (part == 7) {
-      _objectFactory.addAsteroids(level, yPos);
-    } else if (part == 8) {
-      _objectFactory.addBossFight(level, yPos);
+    double scroll(double scrollSpeed) {
+      position += new Offset(0.0, scrollSpeed);
+      return position.dy;
     }
   }
-
-  void fire() {
-    int laserLevel = _objectFactory.playerState.laserLevel;
-
-    Laser shot0 = new Laser(_objectFactory, laserLevel, -90.0);
-    shot0.position = _level.ship.position + new Offset(17.0, -10.0);
-    _level.addChild(shot0);
-
-    Laser shot1 = new Laser(_objectFactory, laserLevel, -90.0);
-    shot1.position = _level.ship.position + new Offset(-17.0, -10.0);
-    _level.addChild(shot1);
-
-    if (_playerState.sideLaserActive) {
-      Laser shot2 = new Laser(_objectFactory, laserLevel, -45.0);
-      shot2.position = _level.ship.position + new Offset(17.0, -10.0);
-      _level.addChild(shot2);
-
-      Laser shot3 = new Laser(_objectFactory, laserLevel, -135.0);
-      shot3.position = _level.ship.position + new Offset(-17.0, -10.0);
-      _level.addChild(shot3);
-    }
-  }
-
-  void killShip() {
-    // Hide ship
-    _level.ship.visible = false;
-
-    _sounds.play("explosion_player");
-
-    // Add explosion
-    ExplosionBig explo = new ExplosionBig(_spritesGame);
-    explo.scale = 1.5;
-    explo.position = _level.ship.position;
-    _level.addChild(explo);
-
-    // Add flash
-    Flash flash = new Flash(size, 1.0);
-    addChild(flash);
-
-    // Set the state to game over
-    _gameOver = true;
-
-    // Return to main scene and report the score back in 2 seconds
-    new Timer(new Duration(seconds: 2), () { _gameOverCallback(_playerState.score, _playerState.coins, _topLevelReached); });
-  }
-}
-
-class Level extends Node {
-  Level() {
-    position = new Offset(160.0, 0.0);
-  }
-
-  Ship ship;
-
-  double scroll(double scrollSpeed) {
-    position += new Offset(0.0, scrollSpeed);
-    return position.dy;
-  }
-}

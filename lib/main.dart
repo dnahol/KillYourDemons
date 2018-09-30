@@ -60,7 +60,8 @@ main() async {
   await _imageMap.load(<String>[
     'assets/nebula.png',
     'assets/sprites.png',
-    'assets/starfield.png',
+    'assets/ocean.png',
+    'assets/done.png',
     'assets/game_ui.png',
     'assets/ui_bg_top.png',
     'assets/ui_bg_bottom.png',
@@ -96,6 +97,7 @@ main() async {
 
   json = await _bundle.loadString('assets/game_ui.json');
   _spriteSheetUI = new SpriteSheet(_imageMap['assets/game_ui.png'], json);
+
 
   assert(_spriteSheet.image != null);
 
@@ -630,7 +632,7 @@ class MainSceneBackgroundNode extends NodeWithSize {
     assert(_spriteSheet.image != null);
 
     // Add background
-    _background = new RepeatedImage(_imageMap["assets/starfield.png"]);
+    _background = new RepeatedImage(_imageMap["assets/ocean.png"]);
     addChild(_background);
 
     StarField starField = new StarField(_spriteSheet, 200, true);
