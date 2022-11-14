@@ -1,6 +1,6 @@
 # Kill Your Demons 😈
 
-A cross-platform (Android and iPhone) mobile mediation game where you plunge into the depths of your psyche, take out your frustrations on those pesky emotions, and do some self-reflection along the way in this colorful take on the classic shoot 'em up game with twist.
+A cross-platform (Android and iPhone) mobile mediation game where you plunge into the depths of your psyche, take out your frustrations on those pesky emotions, and do some self-reflection along the way in this colorful take on the classic shoot 'em up game with a twist.
 
 Presented playable game demo at Bay Area Women in Games event and received positive reviews. Coming to an app store near you!
 
