@@ -4,11 +4,18 @@ A cross-platform (Android and iPhone) mobile mediation game where you plunge int
 
 Presented playable game demo at Bay Area Women in Games event and received positive reviews. Coming to an app store near you!
 
-## Version 1 (2D)
+## Kill Your Demons 1 🧜‍♀️(2D)
 
 ![the stream of emotions](https://i.imgur.com/u2hHjMN.png)
 
 ![logo](https://i.imgur.com/2lVh3cF.jpg)
+
+## Kill Your Demons 2 🔊(3D)
+
+If you liked Kill Your Demons 1, we are working on a 3D underwater adventure on mobile!
+
+Some visual inspiration from Ernest Cline's zero gravity dance room in Ready Player 1. Movie version:
+https://thumbs.gfycat.com/PersonalWildIndianskimmer-mobile.mp4
 
 ## About Flutter
 
